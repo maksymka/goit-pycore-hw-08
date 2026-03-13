@@ -5,6 +5,7 @@ from typing import List, Optional, Tuple, Callable
 
 # --- КЛАСИ ДЛЯ ДАНИХ (ЛОГІКА) ---
 
+
 class Field:
     def __init__(self, value: str):
         self.value = value
@@ -12,8 +13,10 @@ class Field:
     def __str__(self) -> str:
         return str(self.value)
 
+
 class Name(Field):
     pass
+
 
 class Phone(Field):
     def __init__(self, value: str):
@@ -24,6 +27,7 @@ class Phone(Field):
     def _validate(self, value: str) -> bool:
         return len(value) == 10 and value.isdigit()
 
+
 class Birthday(Field):
     def __init__(self, value: str):
         try:
@@ -33,6 +37,7 @@ class Birthday(Field):
 
     def __str__(self) -> str:
         return self.value.strftime("%d.%m.%Y")
+
 
 class Record:
     def __init__(self, name: str):
@@ -65,6 +70,7 @@ class Record:
         birthday = f", birthday: {self.birthday}" if self.birthday else ""
         return f"Contact name: {self.name.value}, phones: {phones}{birthday}"
 
+
 class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
@@ -84,15 +90,18 @@ class AddressBook(UserDict):
             if 0 <= (bday - today).days <= 7:
                 if bday.weekday() >= 5:
                     bday += timedelta(days=(7 - bday.weekday()))
-                upcoming.append({"name": record.name.value, "congratulation_date": bday.strftime("%d.%m.%Y")})
+                upcoming.append(
+                    {"name": record.name.value, "congratulation_date": bday.strftime("%d.%m.%Y")})
         return upcoming
 
 # --- ФУНКЦІЇ ЗБЕРЕЖЕННЯ ТА ЗАВАНТАЖЕННЯ (НОВЕ) ---
+
 
 def save_data(book, filename="addressbook.pkl"):
     """Серіалізація адресної книги у файл."""
     with open(filename, "wb") as f:
         pickle.dump(book, f)
+
 
 def load_data(filename="addressbook.pkl"):
     """Десеріалізація адресної книги з файлу."""
@@ -103,6 +112,7 @@ def load_data(filename="addressbook.pkl"):
         return AddressBook()  # Повертаємо нову книгу, якщо файл відсутній
 
 # --- ОБРОБКА КОМАНД ---
+
 
 def input_error(func: Callable) -> Callable:
     def inner(*args, **kwargs):
@@ -116,11 +126,13 @@ def input_error(func: Callable) -> Callable:
             return "Enter the argument for the command."
     return inner
 
+
 def parse_input(user_input: str) -> Tuple[str, List[str]]:
     if not user_input.strip():
         return "", []
     cmd, *args = user_input.split()
     return cmd.strip().lower(), args
+
 
 @input_error
 def add_contact(args, book):
@@ -136,11 +148,12 @@ def add_contact(args, book):
 
 # --- ОСНОВНИЙ ЦИКЛ ---
 
+
 def main():
     # Завантажуємо дані при старті
     book = load_data()
     print("Welcome to the assistant bot!")
-    
+
     while True:
         user_input = input("Enter a command: ")
         command, args = parse_input(user_input)
@@ -150,7 +163,7 @@ def main():
             save_data(book)
             print("Good bye!")
             break
-            
+
         elif command == "hello":
             print("How can I help you?")
         elif command == "add":
@@ -174,6 +187,7 @@ def main():
                 print(f"{entry['name']}: {entry['congratulation_date']}")
         else:
             print("Invalid command.")
+
 
 if __name__ == "__main__":
     main()
